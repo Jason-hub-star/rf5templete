@@ -1,0 +1,37 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Oo]bj/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# IDE / generated solution files
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+.vsconfig
+
+# Build artifacts / archives
+*.apk
+*.aab
+*.unitypackage
+*.zip
+
+# Local verification / scratch folders
+archive/
+FR5_Slim_Template_Verification/
+FR5_Slim_Template_Verification_Clean/
+FR5_Slim_Template_Verification_Fresh/
+
+# OS noise
+Thumbs.db
+Desktop.ini
