@@ -2,7 +2,7 @@
 
 ## 1. Compile
 
-- `unityctl check --project C:/Users/ezen601/Desktop/Jason/robotapp2 --json`
+- `unityctl check --project <path-to-project> --json`
 - compile error 0 확인
 
 ## 2. Scene

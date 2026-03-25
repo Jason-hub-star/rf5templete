@@ -14,7 +14,7 @@ namespace KineTutor3D.App
         public const string ControlPrefabAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_Control.prefab";
         public const string PreviewMaterialAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_Preview.mat";
         public const string RuntimeRobotFolder = "Assets/Runtime/Robots/FAIRINO_FR5";
-        public const string ExternalRoot = @"C:\Users\ezen601\Desktop\Jason\robottemplete";
+        public const string ExternalRoot = ".";
         public const string UnityPackageName = "FAIRINO_FR5_TEMPLATE_Slim.unitypackage";
         public const string ZipName = "FAIRINO_FR5_TEMPLATE_Slim.zip";
         public const string EvidenceFolderName = "evidence";
