@@ -99,4 +99,4 @@ FAIRINO FR5와의 연결 신호만 안전하게 확인하기 위한 문서입니
 
 - `Logs/fairino-live-smoke.log`
 
-문제 파악 순서는 [TROUBLESHOOTING.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/TROUBLESHOOTING.md)를 참고하세요.
+문제 파악 순서는 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)를 참고하세요.

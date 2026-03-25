@@ -70,4 +70,4 @@
 4. 콘솔에 compile error가 없는지 확인합니다.
 5. 필요하면 Unity를 완전히 껐다가 프로젝트만 다시 엽니다.
 
-추가 장애 대응은 [TROUBLESHOOTING.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/TROUBLESHOOTING.md)를 참고하세요.
+추가 장애 대응은 [TROUBLESHOOTING.md](TROUBLESHOOTING.md)를 참고하세요.

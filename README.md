@@ -42,7 +42,7 @@
 4. 관절 링을 드래그해 로봇 자세가 바뀌는지 확인합니다.
 5. 로봇이 분홍색이면 `RobotTemplate > Fix URP Pipeline`을 실행합니다.
 
-세팅 자세한 내용은 [docs/SETUP.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/SETUP.md), 사용 흐름은 [docs/USAGE.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/USAGE.md)를 보면 됩니다.
+세팅 자세한 내용은 [docs/SETUP.md](docs/SETUP.md), 사용 흐름은 [docs/USAGE.md](docs/USAGE.md)를 보면 됩니다.
 
 ## 실기기 연동 관련 현재 상태
 
@@ -68,7 +68,7 @@
 씬 화면에서 직접 위치, 색, 텍스트, 버튼 구성을 수정할 수 있습니다.
 Play 중에는 이 패널에서 IP/포트를 입력한 뒤 `연결 신호 확인` 버튼으로 결과를 바로 볼 수 있습니다.
 
-사용법은 [docs/LIVE-SMOKE.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/LIVE-SMOKE.md)를 보세요.
+사용법은 [docs/LIVE-SMOKE.md](docs/LIVE-SMOKE.md)를 보세요.
 
 ## 2026-03-25 기준 확인 결과
 
@@ -80,9 +80,9 @@ Play 중에는 이 패널에서 IP/포트를 입력한 뒤 `연결 신호 확인
 
 즉 현재 상태는 "코드와 DLL 이식은 완료, 실제 컨트롤러 네트워크 응답은 아직 미확인"입니다.
 
-문제 파악은 [docs/TROUBLESHOOTING.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/TROUBLESHOOTING.md),  
-이식 준비 문서는 [docs/LIVE-INTEGRATION-PREP.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/LIVE-INTEGRATION-PREP.md),  
-현장 체크리스트는 [docs/LIVE-INTEGRATION-CHECKLIST.md](C:/Users/ezen601/Desktop/Jason/robottemplete/docs/LIVE-INTEGRATION-CHECKLIST.md)를 참고하세요.
+문제 파악은 [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md),  
+이식 준비 문서는 [docs/LIVE-INTEGRATION-PREP.md](docs/LIVE-INTEGRATION-PREP.md),  
+현장 체크리스트는 [docs/LIVE-INTEGRATION-CHECKLIST.md](docs/LIVE-INTEGRATION-CHECKLIST.md)를 참고하세요.
 
 ## 프리팹 역할
 
