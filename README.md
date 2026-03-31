@@ -66,7 +66,7 @@
 
 데모 씬에는 `FairinoLiveSmokeCanvas` 오브젝트가 실제로 저장되어 있으며,
 씬 화면에서 직접 위치, 색, 텍스트, 버튼 구성을 수정할 수 있습니다.
-Play 중에는 이 패널에서 IP/포트를 입력한 뒤 `연결 신호 확인` 버튼으로 결과를 바로 볼 수 있습니다.
+Play 중에는 이 패널에서 IP를 입력한 뒤 `연결 신호 확인` 버튼으로 결과를 바로 볼 수 있습니다.
 
 사용법은 [docs/LIVE-SMOKE.md](docs/LIVE-SMOKE.md)를 보세요.
 
@@ -76,9 +76,10 @@ Play 중에는 이 패널에서 IP/포트를 입력한 뒤 `연결 신호 확인
 
 - 컴파일 오류 0건
 - `read-only live smoke` 실행 성공
-- 다만 실제 연결은 `192.168.58.2:8080`에서 응답이 없어 `CONNECT_FAIL` 발생
+- 다만 실제 연결은 `192.168.58.2`에서 응답이 없어 `CONNECT_FAIL` 발생
 
 즉 현재 상태는 "코드와 DLL 이식은 완료, 실제 컨트롤러 네트워크 응답은 아직 미확인"입니다.
+FAIRINO C# SDK 연결 함수는 `RPC(ip)` 형태라 이 템플릿의 smoke는 포트 입력을 사용하지 않습니다.
 
 문제 파악은 [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md),  
 이식 준비 문서는 [docs/LIVE-INTEGRATION-PREP.md](docs/LIVE-INTEGRATION-PREP.md),  

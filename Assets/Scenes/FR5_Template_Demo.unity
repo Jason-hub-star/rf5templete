@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &269647460
 RectTransform:
   m_ObjectHideFlags: 0
@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 448448371}
   - component: {fileID: 448448370}
   m_Layer: 0
-  m_Name: PortLabel
+  m_Name: IpNote
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -379,7 +379,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 264, y: -57.600002}
-  m_SizeDelta: {x: 96, y: 16.800001}
+  m_SizeDelta: {x: 220.8, y: 33.600002}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &448448370
 MonoBehaviour:
@@ -403,8 +403,8 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 13
-    m_FontStyle: 1
+    m_FontSize: 12
+    m_FontStyle: 2
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
@@ -414,7 +414,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Port
+  m_Text: "RPC(ip)\n\uC2E4\uC81C \uD3EC\uD2B8 \uC785\uB825 \uC5C6\uC74C"
 --- !u!222 &448448371
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -699,7 +699,6 @@ MonoBehaviour:
   successLabel: "\uC5F0\uACB0 \uC131\uACF5"
   partialSuccessLabel: "\uBD80\uBD84 \uC131\uACF5"
   failLabel: "\uC5F0\uACB0 \uC2E4\uD328"
-  inputErrorLabel: "\uC785\uB825 \uC624\uB958"
   runtimeErrorLabel: "\uC2E4\uD589 \uC624\uB958"
   idleColor: {r: 0.78, g: 0.83, b: 0.9, a: 1}
   runningColor: {r: 0.99, g: 0.84, b: 0.32, a: 1}
@@ -1069,7 +1068,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -14.400024, y: -14.400024}
+  m_AnchoredPosition: {x: -531, y: -14.400024}
   m_SizeDelta: {x: 504.00003, y: 432.00003}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &893947927
@@ -1807,7 +1806,7 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 8080
@@ -1886,7 +1885,7 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 192.168.58.2

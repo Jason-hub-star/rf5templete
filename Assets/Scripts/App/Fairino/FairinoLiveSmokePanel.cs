@@ -11,7 +11,6 @@ namespace KineTutor3D.App.Fairino
     public sealed class FairinoLiveSmokePanel : MonoBehaviour
     {
         private const string DefaultIp = "192.168.58.2";
-        private const int DefaultPort = 8080;
 
         [Header("Inputs")]
         [SerializeField] private InputField ipInput;
@@ -30,7 +29,6 @@ namespace KineTutor3D.App.Fairino
         [SerializeField] private string successLabel = "연결 성공";
         [SerializeField] private string partialSuccessLabel = "부분 성공";
         [SerializeField] private string failLabel = "연결 실패";
-        [SerializeField] private string inputErrorLabel = "입력 오류";
         [SerializeField] private string runtimeErrorLabel = "실행 오류";
 
         [Header("Colors")]
@@ -92,21 +90,15 @@ namespace KineTutor3D.App.Fairino
 
             try
             {
-                if (!int.TryParse(GetPortText(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var port))
-                {
-                    SetStatus(inputErrorLabel, failColor);
-                    SetDetails("포트는 숫자로 입력해야 합니다.");
-                    yield break;
-                }
-
                 var ip = string.IsNullOrWhiteSpace(GetIpText()) ? DefaultIp : GetIpText().Trim();
                 client = new LiveFairinoClient();
 
                 AppendLine(report, $"시간: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-                AppendLine(report, $"대상: {ip}:{port}");
+                AppendLine(report, $"대상 IP: {ip}");
+                AppendLine(report, "연결 방식: FAIRINO C# SDK RPC(ip) - 포트 입력은 사용하지 않음");
                 AppendLine(report, string.Empty);
 
-                var connect = client.Connect(ip, port);
+                var connect = client.Connect(ip);
                 AppendStep(report, "Connect", connect.IsSuccess, connect.Message, connect.ErrorCode);
                 if (!connect.IsSuccess)
                 {
@@ -122,7 +114,9 @@ namespace KineTutor3D.App.Fairino
                     AppendLine(report, $"SDK: {version.Value.SdkVersion}");
                     AppendLine(report, $"Software: {version.Value.SoftwareVersion}");
                     AppendLine(report, $"Controller: {version.Value.ControllerVersion}");
-                    AppendLine(report, $"Firmware/Hardware: {version.Value.FirmwareVersion}");
+                    AppendLine(report, $"ControllerIP: {version.Value.ControllerIp}");
+                    AppendLine(report, $"Firmware: {version.Value.FirmwareVersion}");
+                    AppendLine(report, $"Hardware: {version.Value.HardwareVersion}");
                 }
                 else
                 {
@@ -179,9 +173,11 @@ namespace KineTutor3D.App.Fairino
                 ipInput = transform.Find("Panel/IpInput")?.GetComponent<InputField>();
             }
 
-            if (portInput == null)
+            var legacyPortInput = portInput ?? transform.Find("Panel/PortInput")?.GetComponent<InputField>();
+            if (legacyPortInput != null)
             {
-                portInput = transform.Find("Panel/PortInput")?.GetComponent<InputField>();
+                portInput = legacyPortInput;
+                legacyPortInput.interactable = false;
             }
 
             if (runButton == null)
@@ -205,11 +201,6 @@ namespace KineTutor3D.App.Fairino
             if (ipInput != null && string.IsNullOrWhiteSpace(ipInput.text))
             {
                 ipInput.text = ReadEnvOrDefault("FAIRINO_IP", DefaultIp);
-            }
-
-            if (portInput != null && string.IsNullOrWhiteSpace(portInput.text))
-            {
-                portInput.text = ReadEnvOrDefault("FAIRINO_PORT", DefaultPort.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -260,11 +251,6 @@ namespace KineTutor3D.App.Fairino
         private string GetIpText()
         {
             return ipInput != null ? ipInput.text : DefaultIp;
-        }
-
-        private string GetPortText()
-        {
-            return portInput != null ? portInput.text : DefaultPort.ToString(CultureInfo.InvariantCulture);
         }
 
         private string GetStatusText()

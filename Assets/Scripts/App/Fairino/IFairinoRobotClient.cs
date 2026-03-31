@@ -5,7 +5,7 @@ namespace KineTutor3D.App.Fairino
         bool IsConnected { get; }
         bool IsEnabled { get; }
 
-        FairinoResult Connect(string ip, int port);
+        FairinoResult Connect(string ip);
         FairinoResult Disconnect();
         FairinoResult Enable();
         FairinoResult Disable();

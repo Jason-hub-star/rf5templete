@@ -20,7 +20,6 @@ namespace KineTutor3D.Editor
             var panel = GetOrCreatePanel(root.transform);
 
             var ipInput = GetOrCreateInputField(panel.transform, "IpInput", SVec(16f, -64f), "192.168.58.2");
-            var portInput = GetOrCreateInputField(panel.transform, "PortInput", SVec(220f, -64f), "8080");
             var runButton = GetOrCreateButton(panel.transform, "RunButton", SVec(16f, -116f), SVec(388f, 34f), "연결 신호 확인");
             var statusValue = GetOrCreateText(panel.transform, "StatusValue", SVec(16f, -166f), SVec(388f, 22f), "미실행", SInt(14), FontStyle.Bold, TextAnchor.MiddleLeft);
             var detailBox = GetOrCreateBox(panel.transform, "DetailBox", SVec(16f, -196f), SVec(388f, 138f), new Color(0.11f, 0.12f, 0.17f, 0.95f));
@@ -29,7 +28,7 @@ namespace KineTutor3D.Editor
             GetOrCreateText(panel.transform, "Title", SVec(16f, -16f), SVec(388f, 24f), "FAIRINO Read-Only Live Smoke", SInt(16), FontStyle.Bold, TextAnchor.MiddleLeft);
             GetOrCreateText(panel.transform, "Subtitle", SVec(16f, -38f), SVec(388f, 18f), "Connect -> Version -> State -> Disconnect만 수행합니다.", SInt(11), FontStyle.Normal, TextAnchor.MiddleLeft);
             GetOrCreateText(panel.transform, "IpLabel", SVec(16f, -48f), SVec(80f, 14f), "IP", SInt(11), FontStyle.Bold, TextAnchor.MiddleLeft);
-            GetOrCreateText(panel.transform, "PortLabel", SVec(220f, -48f), SVec(80f, 14f), "Port", SInt(11), FontStyle.Bold, TextAnchor.MiddleLeft);
+            GetOrCreateText(panel.transform, "IpNote", SVec(220f, -60f), SVec(184f, 28f), "RPC(ip)만 사용\n실제 포트 입력 없음", SInt(10), FontStyle.Italic, TextAnchor.MiddleLeft, new Color(0.74f, 0.79f, 0.87f, 0.92f));
             GetOrCreateText(panel.transform, "StatusLabel", SVec(16f, -146f), SVec(80f, 16f), "상태", SInt(11), FontStyle.Bold, TextAnchor.MiddleLeft);
 
             var smokePanel = root.GetComponent<FairinoLiveSmokePanel>();
@@ -39,7 +38,6 @@ namespace KineTutor3D.Editor
             }
 
             AssignField(smokePanel, "ipInput", ipInput);
-            AssignField(smokePanel, "portInput", portInput);
             AssignField(smokePanel, "runButton", runButton);
             AssignField(smokePanel, "statusText", statusValue);
             AssignField(smokePanel, "detailText", detailValue);

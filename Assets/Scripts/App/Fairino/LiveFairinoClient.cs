@@ -21,7 +21,7 @@ namespace KineTutor3D.App.Fairino
             errorTranslator = translator ?? new FairinoErrorTranslator();
         }
 
-        public FairinoResult Connect(string ip, int port)
+        public FairinoResult Connect(string ip)
         {
             if (string.IsNullOrWhiteSpace(ip))
             {
@@ -44,12 +44,12 @@ namespace KineTutor3D.App.Fairino
                     connected = false;
                     return FairinoResult.Fail(
                         result.ErrorCode,
-                        $"RPC 연결 실패 (ip={ip}, port={port}, code={result.ErrorCode}). 컨트롤러 전원, 네트워크, SDK 호환 버전을 확인하세요.");
+                        $"RPC 연결 실패 (ip={ip}, code={result.ErrorCode}). 컨트롤러 전원, 네트워크, SDK 호환 버전을 확인하세요.");
                 }
 
                 connected = true;
                 enabled = false;
-                return FairinoResult.Ok($"연결 성공: {ip}:{port}");
+                return FairinoResult.Ok($"연결 성공: {ip}");
             }
             catch (Exception ex)
             {
@@ -151,6 +151,16 @@ namespace KineTutor3D.App.Fairino
                 var sdkVersion = ReadSingleStringByRef("GetSDKVersion");
                 var softwareVersion = ReadStringsByRef("GetSoftwareVersion", string.Empty, string.Empty, string.Empty);
                 var hardwareVersion = ReadStringsByRef(
+                    "GetHardwareVersion",
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty);
+                var firmwareVersion = ReadStringsByRef(
                     "GetFirmwareVersion",
                     string.Empty,
                     string.Empty,
@@ -161,8 +171,10 @@ namespace KineTutor3D.App.Fairino
                     string.Empty,
                     string.Empty);
 
-                var firmwareSummary = JoinNonEmpty(hardwareVersion);
+                var controllerIp = ReadSingleStringByRef("GetControllerIP");
+                var firmwareSummary = JoinNonEmpty(firmwareVersion);
                 var softwareSummary = JoinNonEmpty(softwareVersion);
+                var hardwareSummary = JoinNonEmpty(hardwareVersion);
                 var controllerVersion = softwareVersion.Length > 2 ? softwareVersion[2] : string.Empty;
 
                 if (string.IsNullOrWhiteSpace(firmwareSummary))
@@ -181,7 +193,8 @@ namespace KineTutor3D.App.Fairino
                         sdkVersion,
                         softwareSummary,
                         controllerVersion,
-                        firmwareSummary));
+                        hardwareSummary,
+                        controllerIp));
             }
             catch (Exception ex)
             {
