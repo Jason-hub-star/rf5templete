@@ -9,6 +9,7 @@
 
 # IDE / generated solution files
 .vs/
+.vscode/
 .idea/
 *.csproj
 *.sln
