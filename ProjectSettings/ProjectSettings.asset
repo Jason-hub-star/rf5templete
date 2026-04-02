@@ -823,7 +823,7 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Standalone: TEST_SYMBOL;DEBUG_MODE
+    Standalone: TEST_SYMBOL;DEBUG_MODE;ROS2
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

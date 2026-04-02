@@ -119,6 +119,60 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &190079830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 190079832}
+  - component: {fileID: 190079831}
+  m_Layer: 0
+  m_Name: ROS_Connection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &190079831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190079830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7acef0b79454c9b4dae3f8139bc4ba77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RosIPAddress: 192.168.0.99
+  m_RosPort: 10000
+  m_ConnectOnStart: 1
+  m_KeepaliveTime: 1
+  m_NetworkTimeoutSeconds: 2
+  m_SleepTimeSeconds: 0.01
+  m_ShowHUD: 1
+  m_TFTopics:
+  - /tf
+  listenForTFMessages: 1
+--- !u!4 &190079832
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190079830}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 325.33966, y: 605.65314, z: -185.23749}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &269647459
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,7 +1122,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -531, y: -14.400024}
+  m_AnchoredPosition: {x: -531, y: -14.4001465}
   m_SizeDelta: {x: 504.00003, y: 432.00003}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &893947927
@@ -1265,6 +1319,7 @@ GameObject:
   m_Component:
   - component: {fileID: 949421788}
   - component: {fileID: 949421787}
+  - component: {fileID: 949421789}
   m_Layer: 0
   m_Name: FR5TemplateDemoRoot
   m_TagString: Untagged
@@ -1302,6 +1357,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &949421789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 949421786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7817e696f990254fb126cdfa6085e24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 949421787}
 --- !u!1 &972584589
 GameObject:
   m_ObjectHideFlags: 0
@@ -1904,3 +1972,4 @@ SceneRoots:
   - {fileID: 949421788}
   - {fileID: 682747618}
   - {fileID: 654487332}
+  - {fileID: 190079832}

@@ -32,6 +32,9 @@ FR5_Slim_Template_Verification/
 FR5_Slim_Template_Verification_Clean/
 FR5_Slim_Template_Verification_Fresh/
 
+# ROS2 workspace
+ros2_ws/
+
 # OS noise
 Thumbs.db
 Desktop.ini

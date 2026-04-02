@@ -8,7 +8,10 @@
     "KineTutor3D.Types",
     "UnityEngine.UI",
     "Unity.TextMeshPro",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.Robotics.ROSTCPConnector",
+    "Unity.Robotics.ROSTCPConnector.Messages",
+    "Unity.Robotics.ROSTCPConnector.MessageGeneration"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
