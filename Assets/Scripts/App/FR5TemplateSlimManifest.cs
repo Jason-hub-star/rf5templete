@@ -9,10 +9,17 @@ namespace KineTutor3D.App
         public const string DemoScenePath = "Assets/Scenes/FR5_Template_Demo.unity";
         public const string RuntimeAsmdefPath = "Assets/Scripts/KineTutor3D.Runtime.asmdef";
         public const string ControlPrefabResourcePath = "Robots/FAIRINO_FR5_Control";
+        public const string ControlPrefabWithEndEffectorResourcePath = "Robots/FAIRINO_FR5_Control_PGEA10040";
         public const string PreviewPrefabResourcePath = "Robots/FAIRINO_FR5";
+        public const string PreviewPrefabWithEndEffectorResourcePath = "Robots/FAIRINO_FR5_PGEA10040";
+        public const string EndEffectorPrefabResourcePath = "EndEffectors/PGEA_100_40";
         public const string PreviewPrefabAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5.prefab";
         public const string ControlPrefabAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_Control.prefab";
+        public const string ControlPrefabWithEndEffectorAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_Control_PGEA10040.prefab";
+        public const string PreviewPrefabWithEndEffectorAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_PGEA10040.prefab";
         public const string PreviewMaterialAssetPath = "Assets/Runtime/Resources/Robots/FAIRINO_FR5_Preview.mat";
+        public const string EndEffectorPrefabAssetPath = "Assets/Runtime/Resources/EndEffectors/PGEA_100_40.prefab";
+        public const string EndEffectorSourceFolder = "Assets/Runtime/EndEffectors/PGEA_100_40";
         public const string RuntimeRobotFolder = "Assets/Runtime/Robots/FAIRINO_FR5";
         public const string ExternalRoot = ".";
         public const string UnityPackageName = "FAIRINO_FR5_TEMPLATE_Slim.unitypackage";
@@ -33,12 +40,20 @@ namespace KineTutor3D.App
             "Assets/Scripts/Templates/TemplateFAIRINO_FR5.cs",
             "Assets/Scripts/Types",
             "Assets/Scripts/Visualization/FairinoUrdfJointDriver.cs",
+            "Assets/Scripts/Visualization/FR5EndEffectorAttachment.cs",
             "Assets/Scripts/Visualization/Shared/JointRotationHandle.cs",
             "Assets/Scripts/Visualization/Shared/OrbitCameraController.cs",
             "Assets/Scripts/Visualization/Shared/SharedLineMaterial.cs",
+            "Assets/Editor/KineTutor3D.Editor.asmdef",
+            "Assets/Editor/FR5EndEffectorAttachmentEditor.cs",
+            "Assets/Editor/FR5EndEffectorSetupTool.cs",
             PreviewPrefabAssetPath,
             ControlPrefabAssetPath,
+            ControlPrefabWithEndEffectorAssetPath,
+            PreviewPrefabWithEndEffectorAssetPath,
             PreviewMaterialAssetPath,
+            EndEffectorPrefabAssetPath,
+            EndEffectorSourceFolder,
             RuntimeRobotFolder
         };
 

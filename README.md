@@ -22,6 +22,9 @@
 - `SharedLineMaterial`
 - `Assets/Runtime/Resources/Robots/FAIRINO_FR5.prefab`
 - `Assets/Runtime/Resources/Robots/FAIRINO_FR5_Control.prefab`
+- `Assets/Runtime/Resources/Robots/FAIRINO_FR5_Control_PGEA10040.prefab` (설치 후 생성)
+- `Assets/Runtime/Resources/Robots/FAIRINO_FR5_PGEA10040.prefab` (설치 후 생성)
+- `Assets/Runtime/Resources/EndEffectors/PGEA_100_40.prefab` (설치 후 생성)
 - `Assets/Runtime/Resources/Robots/FAIRINO_FR5_Preview.mat`
 - `Assets/Runtime/Robots/FAIRINO_FR5/` 전체
 - 최소 실기 확인용 `read-only live smoke`
@@ -69,6 +72,19 @@
 Play 중에는 이 패널에서 IP를 입력한 뒤 `연결 신호 확인` 버튼으로 결과를 바로 볼 수 있습니다.
 
 사용법은 [docs/LIVE-SMOKE.md](docs/LIVE-SMOKE.md)를 보세요.
+
+## 엔드이펙터 기본 정책
+
+PGEA-100-40 엔드이펙터는 아래 순서를 기본으로 둡니다.
+
+- Unity runtime visual source는 `STL`
+- 원본 CAD 보관본은 `STEP`
+- 팀 공용 prefab 진실값은 `FR5_Control_PGEA10040`
+- TCP 기준점은 mesh origin이 아니라 prefab 안의 `TcpFrame`
+- 기본 방향은 `gripper side = 바깥`, `mount side = robot flange`
+
+한 번 설정하면 데모 씬은 attached FR5 variant를 우선 로드합니다.
+세부 워크플로우는 [docs/END-EFFECTOR-PGEA10040.md](docs/END-EFFECTOR-PGEA10040.md)를 보세요.
 
 ## 2026-03-25 기준 확인 결과
 

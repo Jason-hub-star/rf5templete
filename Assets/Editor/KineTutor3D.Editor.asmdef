@@ -1,0 +1,27 @@
+{
+  "name": "KineTutor3D.Editor",
+  "rootNamespace": "KineTutor3D.Editor",
+  "references": [
+    "KineTutor3D.Runtime",
+    "KineTutor3D.Kinematics",
+    "KineTutor3D.Math",
+    "KineTutor3D.Templates",
+    "KineTutor3D.Types",
+    "Unity.Robotics.UrdfImporter",
+    "Unity.RenderPipelines.Universal.Runtime",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

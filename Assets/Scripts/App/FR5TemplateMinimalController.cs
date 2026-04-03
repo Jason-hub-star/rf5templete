@@ -181,7 +181,8 @@ namespace KineTutor3D.App
                 return;
             }
 
-            var prefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.ControlPrefabResourcePath);
+            var prefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.ControlPrefabWithEndEffectorResourcePath)
+                ?? Resources.Load<GameObject>(FR5TemplateSlimManifest.ControlPrefabResourcePath);
             if (prefab == null)
             {
                 Debug.LogError("[FR5TemplateMinimalController] Control prefab missing at Resources/Robots/FAIRINO_FR5_Control.");
@@ -224,7 +225,8 @@ namespace KineTutor3D.App
                 return;
             }
 
-            var prefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.PreviewPrefabResourcePath);
+            var prefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.PreviewPrefabWithEndEffectorResourcePath)
+                ?? Resources.Load<GameObject>(FR5TemplateSlimManifest.PreviewPrefabResourcePath);
             if (prefab == null)
             {
                 return;

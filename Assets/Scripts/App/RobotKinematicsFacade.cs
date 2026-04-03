@@ -20,6 +20,7 @@ namespace KineTutor3D.App
         private double[] jointValuesRad;
         private Mat4D[] cumulativeTransforms;
         private Mat4D endEffectorTransform;
+        private Mat4D tcpOffset = Mat4D.Identity;
 
         /// <summary>
         /// FK가 갱신될 때 발생하는 이벤트입니다.
@@ -145,6 +146,16 @@ namespace KineTutor3D.App
         }
 
         /// <summary>
+        /// TCP 오프셋을 설정합니다. EndEffectorTransform에 T_0n * tcpOffset으로 반영됩니다.
+        /// identity이면 flange 좌표 기준, calibration 값이면 gripper TCP 기준이 됩니다.
+        /// </summary>
+        public void SetTcpOffset(Mat4D offset)
+        {
+            tcpOffset = offset;
+            Recompute();
+        }
+
+        /// <summary>
         /// DH 파라미터를 템플릿 기본값으로 복원합니다.
         /// </summary>
         public void ResetToDefault()
@@ -157,7 +168,7 @@ namespace KineTutor3D.App
         private void Recompute()
         {
             cumulativeTransforms = ForwardKinematics.ComputeAll(links, jointValuesRad);
-            endEffectorTransform = cumulativeTransforms[cumulativeTransforms.Length - 1];
+            endEffectorTransform = cumulativeTransforms[cumulativeTransforms.Length - 1] * tcpOffset;
             OnKinematicsUpdated?.Invoke(cumulativeTransforms, endEffectorTransform);
         }
     }

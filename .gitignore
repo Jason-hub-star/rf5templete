@@ -36,6 +36,12 @@ FR5_Slim_Template_Verification_Fresh/
 # ROS2 workspace
 ros2_ws/
 
+# Evidence screenshots (dev-time only)
+evidence/
+
+# IDE solution
+*.slnx
+
 # OS noise
 Thumbs.db
 Desktop.ini

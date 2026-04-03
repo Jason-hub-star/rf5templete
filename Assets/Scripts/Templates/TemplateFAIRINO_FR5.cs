@@ -14,6 +14,19 @@ namespace KineTutor3D.Templates
         private const double Deg2Rad = System.Math.PI / 180.0;
 
         /// <summary>
+        /// PGEA-100-40 그리퍼의 TCP 오프셋 (flange 기준, 미터/라디안).
+        /// [x, y, z, rx, ry, rz] — SetToolCoord coord 파라미터와 동일 형식.
+        /// 현재 값은 calibration 전 placeholder이며, 실기 calibration 후 교체해야 한다.
+        /// </summary>
+        public static readonly double[] TcpOffsetMeters = { 0d, 0d, 0d, 0d, 0d, 0d };
+
+        /// <summary>
+        /// TCP가 실기 calibration으로 확정되었는지 여부.
+        /// false이면 TcpOffsetMeters는 placeholder이며 flange 좌표와 동일하다.
+        /// </summary>
+        public const bool TcpCalibrated = false;
+
+        /// <summary>
         /// FAIRINO FR5 기본 DH 파라미터로 템플릿을 생성합니다.
         /// </summary>
         public static RobotTemplate Create()
