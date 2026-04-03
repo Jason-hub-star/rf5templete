@@ -41,6 +41,7 @@ namespace KineTutor3D.App
             "Assets/Scripts/Types",
             "Assets/Scripts/Visualization/FairinoUrdfJointDriver.cs",
             "Assets/Scripts/Visualization/FR5EndEffectorAttachment.cs",
+            "Assets/Scripts/Visualization/FR5EndEffectorAttachmentPoseSync.cs",
             "Assets/Scripts/Visualization/Shared/JointRotationHandle.cs",
             "Assets/Scripts/Visualization/Shared/OrbitCameraController.cs",
             "Assets/Scripts/Visualization/Shared/SharedLineMaterial.cs",

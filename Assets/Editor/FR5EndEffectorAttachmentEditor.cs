@@ -1,6 +1,9 @@
 #if UNITY_EDITOR
+using System;
+using KineTutor3D.App;
 using KineTutor3D.Visualization;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace KineTutor3D.Editor
@@ -33,6 +36,19 @@ namespace KineTutor3D.Editor
             referenceMode = (EndEffectorReferenceMode)EditorGUILayout.EnumPopup("Reference", referenceMode);
             stepMillimeters = EditorGUILayout.FloatField("Step (mm)", Mathf.Max(0.1f, stepMillimeters));
 
+            if (IsEditingControlVariant(attachment))
+            {
+                EditorGUILayout.HelpBox(
+                    "FAIRINO_FR5_Control_PGEA10040가 기준점입니다. Preview는 로드 시 Control 포즈를 따라가고, 아래 버튼으로 preview asset도 다시 맞출 수 있습니다.",
+                    MessageType.Info);
+
+                if (GUILayout.Button("Sync Preview Variant From Control"))
+                {
+                    var summary = FR5EndEffectorSetupTool.SyncPreviewVariantFromControl();
+                    Debug.Log(summary);
+                }
+            }
+
             EditorGUILayout.HelpBox(
                 $"TCP Local Position: {attachment.CurrentTcpLocalPosition}\nTCP Local Euler: {attachment.CurrentTcpLocalEulerAngles}",
                 MessageType.Info);
@@ -48,6 +64,7 @@ namespace KineTutor3D.Editor
                 EditorUtility.SetDirty(attachment.TcpFrame);
                 EditorUtility.SetDirty(attachment);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(attachment.TcpFrame);
+                SyncPreviewVariantIfNeeded(attachment);
                 SceneView.RepaintAll();
             }
         }
@@ -80,7 +97,49 @@ namespace KineTutor3D.Editor
             EditorUtility.SetDirty(attachment.TcpFrame);
             EditorUtility.SetDirty(attachment);
             PrefabUtility.RecordPrefabInstancePropertyModifications(attachment.TcpFrame);
+            SyncPreviewVariantIfNeeded(attachment);
             SceneView.RepaintAll();
+        }
+
+        private static void SyncPreviewVariantIfNeeded(FR5EndEffectorAttachment attachment)
+        {
+            if (!IsEditingControlVariant(attachment))
+            {
+                return;
+            }
+
+            Debug.Log(FR5EndEffectorSetupTool.SyncPreviewVariantFromControl());
+        }
+
+        private static bool IsEditingControlVariant(FR5EndEffectorAttachment attachment)
+        {
+            var assetPath = GetOwningPrefabAssetPath(attachment);
+            return string.Equals(
+                assetPath,
+                FR5TemplateSlimManifest.ControlPrefabWithEndEffectorAssetPath,
+                StringComparison.Ordinal);
+        }
+
+        private static string GetOwningPrefabAssetPath(Component component)
+        {
+            if (component == null)
+            {
+                return string.Empty;
+            }
+
+            var prefabStage = PrefabStageUtility.GetPrefabStage(component.gameObject);
+            if (prefabStage != null)
+            {
+                return prefabStage.assetPath;
+            }
+
+            var nearestRoot = PrefabUtility.GetNearestPrefabInstanceRoot(component.gameObject);
+            if (nearestRoot != null)
+            {
+                return PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(nearestRoot);
+            }
+
+            return AssetDatabase.GetAssetPath(component.gameObject);
         }
     }
 }

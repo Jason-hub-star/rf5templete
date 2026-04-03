@@ -11,15 +11,10 @@ namespace KineTutor3D.Editor
 {
     public static class FR5EndEffectorSetupTool
     {
-        private const string ExternalStlPath = @"C:\Users\ezen601\Documents\카카오톡 받은 파일\PGEA-100-40.stl";
-        private const string ExternalFbxPath = @"C:\Users\ezen601\Documents\카카오톡 받은 파일\PGEA-100-40.fbx";
-        private const string ExternalStepPath = @"C:\Users\ezen601\Documents\카카오톡 받은 파일\PGEA-100-40-W-F_V1.0_3D_20241226.STEP";
-
         private const string ProjectStlFolder = "Assets/Runtime/EndEffectors/PGEA_100_40/Source";
-        private const string ProjectStlPath = ProjectStlFolder + "/PGEA-100-40.stl";
-        private const string ProjectFbxPath = ProjectStlFolder + "/PGEA-100-40.fbx";
-        private const string ArchiveStepFolder = "archive/EndEffectors/PGEA_100_40/CAD";
-        private const string ArchiveStepPath = ArchiveStepFolder + "/PGEA-100-40-W-F_V1.0_3D_20241226.STEP";
+        private const string ProjectBodyStlPath = ProjectStlFolder + "/PGEA-100-40_body.stl";
+        private const string ProjectFingerLeftStlPath = ProjectStlFolder + "/PGEA-100-40_finger_left.stl";
+        private const string ProjectFingerRightStlPath = ProjectStlFolder + "/PGEA-100-40_finger_right.stl";
 
         private const string EndEffectorResourceFolder = "Assets/Runtime/Resources/EndEffectors";
         private const string EndEffectorPrefabPath = EndEffectorResourceFolder + "/PGEA_100_40.prefab";
@@ -33,11 +28,21 @@ namespace KineTutor3D.Editor
         private const float MillimetersToMeters = 0.001f;
         // ToolMount stays at identity — rotation is applied to the end effector instance.
         private static readonly Quaternion DefaultAttachmentRotation = Quaternion.identity;
-        // FBX 기반: 원점이 메쉬 중심 근처(XY≈0), Y축=길이방향, Z=-3.256 오프셋.
-        // FBX는 STL과 달리 편심이 거의 없으므로 최소 보정만 필요.
-        private static readonly Quaternion EndEffectorLocalRotation = Quaternion.identity;
-        private static readonly Vector3 EndEffectorLocalPosition = Vector3.zero;
-        private const bool UseFbxSource = true;
+        // Bootstrap defaults are only used before a tuned Control prefab exists.
+        private static readonly Quaternion BootstrapEndEffectorLocalRotation = Quaternion.Euler(0f, 0f, -91.6f);
+        private static readonly Vector3 BootstrapEndEffectorLocalPosition = new Vector3(0.003f, 0.1676f, 0.031f);
+        private static readonly Vector3 BootstrapTcpLocalPosition = new Vector3(-0.0811f, 0f, -0.0325f);
+        private const float BootstrapModelLocalZ = -0.031f;
+        private static readonly string[] PartStlPaths = { ProjectBodyStlPath, ProjectFingerLeftStlPath, ProjectFingerRightStlPath };
+        private static readonly string[] PartNames = { "body", "finger_left", "finger_right" };
+
+        [MenuItem("RobotTemplate/End Effector/Sync Preview Variant From Control", priority = 121)]
+        public static void SyncPreviewVariantFromControlMenu()
+        {
+            var summary = SyncPreviewVariantFromControl();
+            Debug.Log(summary);
+            EditorUtility.DisplayDialog("FR5 End Effector Sync", summary, "OK");
+        }
 
         [MenuItem("RobotTemplate/End Effector/Install PGEA-100-40 On FR5", priority = 120)]
         public static void InstallPgea10040Menu()
@@ -54,64 +59,56 @@ namespace KineTutor3D.Editor
 
         private static string InstallOrRefresh()
         {
-            CopyExternalFilesIntoProject();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            GameObject modelAsset = null;
-
-            if (UseFbxSource && File.Exists(ProjectFbxPath))
+            // Import 3 STL parts (body, finger_left, finger_right)
+            var partAssets = new GameObject[PartStlPaths.Length];
+            for (var i = 0; i < PartStlPaths.Length; i++)
             {
-                AssetDatabase.ImportAsset(ProjectFbxPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-                modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(ProjectFbxPath);
-            }
+                var stlPath = PartStlPaths[i];
+                if (!File.Exists(stlPath))
+                {
+                    return $"[FR5 End Effector] Missing STL: {stlPath}";
+                }
 
-            if (modelAsset == null)
-            {
-                StlAssetPostProcessor.PostprocessStlFile(ProjectStlPath);
-                AssetDatabase.ImportAsset(ProjectStlPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
-                modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(StlAssetPostProcessor.GetPrefabAssetPath(ProjectStlPath));
-            }
-
-            if (modelAsset == null)
-            {
-                return $"[FR5 End Effector] Model import failed. Checked FBX at '{ProjectFbxPath}' and STL at '{ProjectStlPath}'.";
+                StlAssetPostProcessor.PostprocessStlFile(stlPath);
+                AssetDatabase.ImportAsset(stlPath, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+                partAssets[i] = AssetDatabase.LoadAssetAtPath<GameObject>(StlAssetPostProcessor.GetPrefabAssetPath(stlPath));
+                if (partAssets[i] == null)
+                {
+                    return $"[FR5 End Effector] Import failed for {stlPath}";
+                }
             }
 
             EnsureFolder(EndEffectorResourceFolder);
-            EnsureEndEffectorPrefab(modelAsset);
-            EnsureRobotVariant(FR5TemplateSlimManifest.ControlPrefabAssetPath, ControlVariantPath);
-            EnsureRobotVariant(FR5TemplateSlimManifest.PreviewPrefabAssetPath, PreviewVariantPath);
+            EnsureEndEffectorPrefab(partAssets);
+            var existingControlAttachment = LoadVariantAttachment(ControlVariantPath);
+            EnsureRobotVariant(FR5TemplateSlimManifest.ControlPrefabAssetPath, ControlVariantPath, existingControlAttachment);
+            var controlAttachment = LoadVariantAttachment(ControlVariantPath);
+            EnsureRobotVariant(FR5TemplateSlimManifest.PreviewPrefabAssetPath, PreviewVariantPath, controlAttachment);
             SaveDemoSceneIfPresent();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            var source = UseFbxSource && File.Exists(ProjectFbxPath) ? "FBX" : "STL";
-            return $"[FR5 End Effector] Installed PGEA-100-40 from {source}, refreshed FR5 control/preview prefabs with shared TCP attachment rig.";
+            return "[FR5 End Effector] Installed PGEA-100-40 (3-part: body + finger_left + finger_right), refreshed FR5 control/preview prefabs.";
         }
 
-        private static void CopyExternalFilesIntoProject()
+        public static string SyncPreviewVariantFromControl()
         {
-            EnsureFolder(ProjectStlFolder);
-            EnsureFileFolder(ArchiveStepPath);
-
-            if (File.Exists(ExternalFbxPath))
+            var controlAttachment = LoadVariantAttachment(ControlVariantPath);
+            if (controlAttachment == null)
             {
-                File.Copy(ExternalFbxPath, ProjectFbxPath, true);
+                return "[FR5 End Effector] Control variant attachment not found. Save FAIRINO_FR5_Control_PGEA10040 first, then sync preview.";
             }
 
-            if (File.Exists(ExternalStlPath))
-            {
-                File.Copy(ExternalStlPath, ProjectStlPath, true);
-            }
-
-            if (File.Exists(ExternalStepPath))
-            {
-                File.Copy(ExternalStepPath, ArchiveStepPath, true);
-            }
+            EnsureRobotVariant(FR5TemplateSlimManifest.PreviewPrefabAssetPath, PreviewVariantPath, controlAttachment);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            return "[FR5 End Effector] Preview variant synced from FAIRINO_FR5_Control_PGEA10040.";
         }
 
-        private static void EnsureEndEffectorPrefab(GameObject modelAsset)
+        private static void EnsureEndEffectorPrefab(GameObject[] partAssets)
         {
             var root = new GameObject(AttachmentId);
             var attachment = root.AddComponent<FR5EndEffectorAttachment>();
@@ -120,31 +117,45 @@ namespace KineTutor3D.Editor
             var visualRoot = new GameObject("VisualRoot").transform;
             visualRoot.SetParent(root.transform, false);
 
-            var modelInstance = PrefabUtility.InstantiatePrefab(modelAsset) as GameObject;
-            if (modelInstance != null)
+            var modelRoot = new GameObject("PGEA-100-40_Model").transform;
+            modelRoot.SetParent(visualRoot, false);
+            modelRoot.localScale = Vector3.one * MillimetersToMeters;
+
+            Transform fingerLeftTransform = null;
+            Transform fingerRightTransform = null;
+
+            for (var i = 0; i < partAssets.Length; i++)
             {
-                if (PrefabUtility.IsPartOfAnyPrefab(modelInstance))
+                var partInstance = PrefabUtility.InstantiatePrefab(partAssets[i]) as GameObject;
+                if (partInstance == null)
                 {
-                    PrefabUtility.UnpackPrefabInstance(modelInstance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+                    continue;
                 }
 
-                modelInstance.name = "PGEA-100-40_Model";
-                modelInstance.transform.SetParent(visualRoot, false);
-                modelInstance.transform.localRotation = Quaternion.identity;
-                if (UseFbxSource)
+                if (PrefabUtility.IsPartOfAnyPrefab(partInstance))
                 {
-                    // FBX: Unity importer가 스케일 처리, 원점이 메쉬 중심 근처
-                    modelInstance.transform.localScale = Vector3.one;
-                    modelInstance.transform.localPosition = Vector3.zero;
+                    PrefabUtility.UnpackPrefabInstance(partInstance, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
                 }
-                else
+
+                partInstance.name = PartNames[i];
+                partInstance.transform.SetParent(modelRoot, false);
+                partInstance.transform.localPosition = Vector3.zero;
+                partInstance.transform.localRotation = Quaternion.identity;
+                partInstance.transform.localScale = Vector3.one;
+                ApplyVisualMaterial(partInstance, visualMaterial);
+
+                if (PartNames[i] == "finger_left")
                 {
-                    // STL: mm 단위, 원점이 비표준
-                    modelInstance.transform.localScale = Vector3.one * MillimetersToMeters;
-                    modelInstance.transform.localPosition = ComputeMountAlignedOffset(modelInstance);
+                    fingerLeftTransform = partInstance.transform;
                 }
-                ApplyVisualMaterial(modelInstance, visualMaterial);
+                else if (PartNames[i] == "finger_right")
+                {
+                    fingerRightTransform = partInstance.transform;
+                }
             }
+
+            // Compute mount-aligned offset using combined bounds of all parts
+            modelRoot.localPosition = ComputeMountAlignedOffset(modelRoot.gameObject);
 
             var tcpFrame = new GameObject("TcpFrame").transform;
             tcpFrame.SetParent(root.transform, false);
@@ -174,6 +185,7 @@ namespace KineTutor3D.Editor
             }
 
             attachment.Configure(AttachmentId, visualRoot, tcpFrame, null);
+            attachment.SetFingers(fingerLeftTransform, fingerRightTransform);
             PrefabUtility.SaveAsPrefabAsset(root, EndEffectorPrefabPath);
             Object.DestroyImmediate(root);
         }
@@ -288,7 +300,18 @@ namespace KineTutor3D.Editor
             };
         }
 
-        private static void EnsureRobotVariant(string sourcePrefabPath, string variantPrefabPath)
+        private static FR5EndEffectorAttachment LoadVariantAttachment(string prefabPath)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            return prefab == null
+                ? null
+                : FR5EndEffectorAttachmentPoseSync.FindAttachment(prefab.transform, AttachmentId);
+        }
+
+        private static void EnsureRobotVariant(
+            string sourcePrefabPath,
+            string variantPrefabPath,
+            FR5EndEffectorAttachment referenceAttachment)
         {
             var endEffectorPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EndEffectorPrefabPath);
             if (endEffectorPrefab == null)
@@ -326,14 +349,15 @@ namespace KineTutor3D.Editor
                 if (instance != null)
                 {
                     instance.name = AttachmentId;
-                    instance.transform.localPosition = EndEffectorLocalPosition;
-                    instance.transform.localRotation = EndEffectorLocalRotation;
-                    instance.transform.localScale = Vector3.one;
 
                     var attachment = instance.GetComponent<FR5EndEffectorAttachment>();
                     if (attachment != null)
                     {
+                        attachment.EnsureStructure();
+                        ApplyVariantAttachmentPose(instance.transform, attachment, referenceAttachment);
                         attachment.SetBaseFrame(baseFrame);
+                        EditorUtility.SetDirty(instance.transform);
+                        EditorUtility.SetDirty(attachment.TcpFrame);
                         EditorUtility.SetDirty(attachment);
                     }
                 }
@@ -343,6 +367,42 @@ namespace KineTutor3D.Editor
             finally
             {
                 PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        private static void ApplyVariantAttachmentPose(
+            Transform attachmentRoot,
+            FR5EndEffectorAttachment targetAttachment,
+            FR5EndEffectorAttachment referenceAttachment)
+        {
+            if (targetAttachment == null || attachmentRoot == null)
+            {
+                return;
+            }
+
+            if (FR5EndEffectorAttachmentPoseSync.CopyPose(referenceAttachment, targetAttachment))
+            {
+                return;
+            }
+
+            attachmentRoot.localPosition = BootstrapEndEffectorLocalPosition;
+            attachmentRoot.localRotation = BootstrapEndEffectorLocalRotation;
+            attachmentRoot.localScale = Vector3.one;
+
+            if (targetAttachment.TcpFrame != null)
+            {
+                targetAttachment.TcpFrame.localPosition = BootstrapTcpLocalPosition;
+                targetAttachment.TcpFrame.localRotation = Quaternion.identity;
+            }
+
+            var modelRoot = targetAttachment.VisualRoot != null
+                ? targetAttachment.VisualRoot.Find("PGEA-100-40_Model")
+                : null;
+            if (modelRoot != null)
+            {
+                var localPosition = modelRoot.localPosition;
+                localPosition.z = BootstrapModelLocalZ;
+                modelRoot.localPosition = localPosition;
             }
         }
 

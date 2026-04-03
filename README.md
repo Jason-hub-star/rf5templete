@@ -41,9 +41,10 @@
 
 1. Unity `6000.0.64f1`로 프로젝트를 엽니다.
 2. `Assets/Scenes/FR5_Template_Demo.unity`를 엽니다.
-3. Play를 실행합니다.
-4. 관절 링을 드래그해 로봇 자세가 바뀌는지 확인합니다.
-5. 로봇이 분홍색이면 `RobotTemplate > Fix URP Pipeline`을 실행합니다.
+3. Scene view에서 에디터 전용 preview 로봇이 보이는지 확인합니다.
+4. Play를 실행합니다.
+5. 관절 링을 드래그해 로봇 자세가 바뀌는지 확인합니다.
+6. 로봇이 분홍색이면 `RobotTemplate > Fix URP Pipeline`을 실행합니다.
 
 세팅 자세한 내용은 [docs/SETUP.md](docs/SETUP.md), 사용 흐름은 [docs/USAGE.md](docs/USAGE.md)를 보면 됩니다.
 
@@ -107,6 +108,9 @@ FAIRINO C# SDK 연결 함수는 `RPC(ip)` 형태라 이 템플릿의 smoke는 �
   쇼룸, 카드 프리뷰 같은 비제어 표시용 프리팹입니다.
 - `FAIRINO_FR5_Control.prefab`
   관절 조작과 3D 제어용 프리팹입니다.
+
+`FR5_Template_Demo` 씬은 Play 전에는 `FAIRINO_FR5` 계열 preview 프리팹만 에디터에 표시하고,
+Play 중에는 제어용 `FAIRINO_FR5_Control` 계열 인스턴스를 런타임 생성합니다.
 
 ## 저장소 구조
 

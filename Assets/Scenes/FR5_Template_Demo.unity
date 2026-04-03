@@ -1340,6 +1340,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialPoseName: Ready
+  showEditorPreviewInEditMode: 1
   spawnPreviewReference: 0
   previewOffset: {x: 1.45, y: 0, z: -0.35}
 --- !u!4 &949421788

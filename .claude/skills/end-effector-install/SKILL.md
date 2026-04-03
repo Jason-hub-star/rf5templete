@@ -49,9 +49,10 @@ description: "FR5에 엔드이펙터(PGEA-100-40) 설치 및 unityctl 검증 —
      └── ToolMount
           └── PGEA_100_40              [FR5EndEffectorAttachment]
                ├── VisualRoot
-               │    └── PGEA-100-40_Model
-               │         ├── PGEA-100-40_0  [MeshFilter, MeshRenderer]
-               │         └── PGEA-100-40_1  [MeshFilter, MeshRenderer]
+               │    └── PGEA-100-40_Model   (scale 0.001)
+               │         ├── body           [MeshFilter, MeshRenderer] (고정)
+               │         ├── finger_left    [MeshFilter, MeshRenderer] (X축 + 이동)
+               │         └── finger_right   [MeshFilter, MeshRenderer] (X축 - 이동)
                └── TcpFrame
                     └── TcpMarker       [MeshFilter, MeshRenderer]
    ```
@@ -65,12 +66,15 @@ description: "FR5에 엔드이펙터(PGEA-100-40) 설치 및 unityctl 검증 —
    - `visualRoot` = "VisualRoot" (null 아님)
    - `tcpFrame` = "TcpFrame" (null 아님)
    - `baseFrame` = "base_link" (null 아님 — 로봇 기본 프레임 참조)
+   - `fingerLeft` = "finger_left" (null 아님 — 좌 핑거 Transform)
+   - `fingerRight` = "finger_right" (null 아님 — 우 핑거 Transform)
+   - `gripperOpenRatio` = 0~1 범위 (개폐 테스트용)
 
 ### Phase 5: 방향 규칙 검증
 1. ToolMount의 Transform 확인: `m_LocalRotation`이 identity `{x:0, y:0, z:0, w:1}` 이어야 함
 2. PGEA_100_40 인스턴스의 로컬 Transform 확인:
    - rotation: `Quaternion(0, 0, -0.71705276, 0.69701904)` ≈ Z -91.6°
-   - position: `(0.004, 0.1699, 0.0324)`
+   - position: `(0.003, 0.1699, 0.0324)`
    - 이 값은 시각적 정렬 값이며 STL 원점 보정용
 3. 그리퍼 jaw side가 로봇 바깥+아래 방향을 향하는지 스크린샷으로 확인
 4. mount side가 wrist3 flange에 붙어있는지 확인

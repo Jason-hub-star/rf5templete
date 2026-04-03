@@ -21,15 +21,28 @@ namespace KineTutor3D.Visualization
         [SerializeField] private Transform visualRoot;
         [SerializeField] private Transform tcpFrame;
         [SerializeField] private Transform baseFrame;
+        [SerializeField] private Transform fingerLeft;
+        [SerializeField] private Transform fingerRight;
         [SerializeField] private float gizmoAxisLength = 0.05f;
         [SerializeField] private float gizmoSphereRadius = 0.008f;
         [SerializeField] private bool tcpCalibrated;
+        [SerializeField, Range(0f, 1f)] private float gripperOpenRatio;
+
+        // Stroke in model-space units (mm). Parent PGEA-100-40_Model has scale 0.001,
+        // so 1 localPosition unit = 1mm in world space after scaling.
+        private const float StrokeMm = 40f; // 40mm total stroke
+        private Vector3 fingerLeftClosed;
+        private Vector3 fingerRightClosed;
+        private bool fingerBaseCaptured;
 
         public string AttachmentId => attachmentId;
         public bool TcpCalibrated => tcpCalibrated;
         public Transform VisualRoot => visualRoot;
         public Transform TcpFrame => tcpFrame;
         public Transform BaseFrame => baseFrame;
+        public Transform FingerLeft => fingerLeft;
+        public Transform FingerRight => fingerRight;
+        public float GripperOpenRatio => gripperOpenRatio;
 
         public Vector3 CurrentTcpLocalPosition => tcpFrame != null ? tcpFrame.localPosition : Vector3.zero;
         public Vector3 CurrentTcpLocalEulerAngles => tcpFrame != null ? tcpFrame.localEulerAngles : Vector3.zero;
@@ -42,9 +55,27 @@ namespace KineTutor3D.Visualization
             baseFrame = baseReference;
         }
 
+        public void SetFingers(Transform left, Transform right)
+        {
+            fingerLeft = left;
+            fingerRight = right;
+            fingerBaseCaptured = false;
+        }
+
+        public void SetGripperOpen(float ratio)
+        {
+            gripperOpenRatio = Mathf.Clamp01(ratio);
+            ApplyGripperPose();
+        }
+
         public void SetBaseFrame(Transform baseReference)
         {
             baseFrame = baseReference;
+        }
+
+        public void SetTcpCalibrated(bool value)
+        {
+            tcpCalibrated = value;
         }
 
         public void EnsureStructure()
@@ -78,6 +109,16 @@ namespace KineTutor3D.Visualization
         {
             visualRoot ??= transform.Find("VisualRoot");
             tcpFrame ??= transform.Find("TcpFrame");
+
+            if (fingerLeft == null || fingerRight == null)
+            {
+                var model = visualRoot != null ? visualRoot.Find("PGEA-100-40_Model") : null;
+                if (model != null)
+                {
+                    fingerLeft ??= model.Find("finger_left");
+                    fingerRight ??= model.Find("finger_right");
+                }
+            }
         }
 
         public void ResetTcpPose()
@@ -113,9 +154,55 @@ namespace KineTutor3D.Visualization
             }
         }
 
+        private void CaptureFingerBase()
+        {
+            if (fingerBaseCaptured || fingerLeft == null || fingerRight == null)
+            {
+                return;
+            }
+
+            // Only capture when ratio is 0 (closed state) to avoid poisoning base position.
+            if (gripperOpenRatio > 0.001f)
+            {
+                return;
+            }
+
+            fingerLeftClosed = fingerLeft.localPosition;
+            fingerRightClosed = fingerRight.localPosition;
+            fingerBaseCaptured = true;
+        }
+
+        public void RecaptureFingerBase()
+        {
+            fingerBaseCaptured = false;
+            CaptureFingerBase();
+        }
+
+        private void ApplyGripperPose()
+        {
+            if (fingerLeft == null || fingerRight == null)
+            {
+                return;
+            }
+
+            CaptureFingerBase();
+
+            if (!fingerBaseCaptured)
+            {
+                return;
+            }
+
+            // Fingers slide along local X axis (parallel jaw open direction in model space).
+            // StrokeMm is in mm (model-space units); each finger moves half-stroke.
+            var halfStroke = StrokeMm * 0.5f * gripperOpenRatio;
+            fingerLeft.localPosition = fingerLeftClosed + new Vector3(halfStroke, 0f, 0f);
+            fingerRight.localPosition = fingerRightClosed + new Vector3(-halfStroke, 0f, 0f);
+        }
+
         private void OnValidate()
         {
             RefreshExistingReferences();
+            ApplyGripperPose();
         }
 
         private void OnDrawGizmos()

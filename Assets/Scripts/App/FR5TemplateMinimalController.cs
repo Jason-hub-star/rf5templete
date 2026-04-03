@@ -11,9 +11,12 @@ namespace KineTutor3D.App
     /// <summary>
     /// FR5 슬림 템플릿 데모 씬에서 관절 링 조작과 3D 포즈 반영만 담당하는 최소 호스트입니다.
     /// </summary>
+    [ExecuteAlways]
     [DisallowMultipleComponent]
     public sealed class FR5TemplateMinimalController : MonoBehaviour
     {
+        private const string EditorPreviewName = "FR5_EditorPreview";
+
         private static readonly Color[] JointColors =
         {
             new Color(0.29f, 0.56f, 0.85f, 1f),
@@ -25,11 +28,13 @@ namespace KineTutor3D.App
         };
 
         [SerializeField] private string initialPoseName = FR5TemplatePoseCatalog.ReadyName;
+        [SerializeField] private bool showEditorPreviewInEditMode = true;
         [SerializeField] private bool spawnPreviewReference;
         [SerializeField] private Vector3 previewOffset = new Vector3(1.45f, 0f, -0.35f);
 
         private Transform runtimeRoot;
         private GameObject controlRobotInstance;
+        private GameObject editorPreviewInstance;
         private GameObject previewRobotInstance;
         private FairinoUrdfJointDriver jointDriver;
         private OrbitCameraController orbitCamera;
@@ -78,6 +83,12 @@ namespace KineTutor3D.App
 
         private void Awake()
         {
+            if (!Application.IsPlaying(gameObject))
+            {
+                EnsureEditorPreviewOnly();
+                return;
+            }
+
             EnsurePresentation();
             EnsureRuntime();
             BindListeners();
@@ -90,12 +101,47 @@ namespace KineTutor3D.App
 
         private void OnEnable()
         {
+            if (!Application.IsPlaying(gameObject))
+            {
+                EnsureEditorPreviewOnly();
+                return;
+            }
+
             BindListeners();
         }
 
         private void OnDisable()
         {
+            if (!Application.IsPlaying(gameObject))
+            {
+                DestroyEditorPreviewImmediate();
+                return;
+            }
+
             UnbindListeners();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (!Application.IsPlaying(gameObject))
+            {
+                DestroyEditorPreviewImmediate();
+            }
+        }
+#endif
+
+        private void Update()
+        {
+#if UNITY_EDITOR
+            if (Application.IsPlaying(gameObject))
+            {
+                DestroyEditorPreviewImmediate();
+                return;
+            }
+
+            EnsureEditorPreviewOnly();
+#endif
         }
 
         private void EnsurePresentation()
@@ -115,6 +161,52 @@ namespace KineTutor3D.App
             EnsurePreviewReference();
             EnsureOrbitCamera();
             EnsureJointHandles();
+        }
+
+        private void EnsureEditorPreviewOnly()
+        {
+#if UNITY_EDITOR
+            if (!showEditorPreviewInEditMode)
+            {
+                DestroyEditorPreviewImmediate();
+                return;
+            }
+
+            if (transform.Find("FR5TemplateRuntimeRoot") != null)
+            {
+                DestroyEditorPreviewImmediate();
+                return;
+            }
+
+            if (editorPreviewInstance == null)
+            {
+                var existing = transform.Find(EditorPreviewName);
+                if (existing != null)
+                {
+                    editorPreviewInstance = existing.gameObject;
+                }
+            }
+
+            if (editorPreviewInstance == null)
+            {
+                var prefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.PreviewPrefabWithEndEffectorResourcePath)
+                    ?? Resources.Load<GameObject>(FR5TemplateSlimManifest.PreviewPrefabResourcePath);
+                if (prefab == null)
+                {
+                    return;
+                }
+
+                editorPreviewInstance = Instantiate(prefab, transform);
+                editorPreviewInstance.name = EditorPreviewName;
+            }
+
+            editorPreviewInstance.transform.SetParent(transform, false);
+            editorPreviewInstance.transform.localPosition = Vector3.zero;
+            editorPreviewInstance.transform.localRotation = Quaternion.identity;
+            editorPreviewInstance.transform.localScale = Vector3.one;
+            SyncEndEffectorPoseFromControl(editorPreviewInstance);
+            ApplyEditorPreviewHideFlags(editorPreviewInstance);
+#endif
         }
 
         private void EnsureRuntimeRoot()
@@ -236,6 +328,27 @@ namespace KineTutor3D.App
             previewRobotInstance.name = "FR5_PreviewReference";
             previewRobotInstance.transform.localPosition = previewOffset;
             previewRobotInstance.transform.localRotation = Quaternion.identity;
+            SyncEndEffectorPoseFromControl(previewRobotInstance);
+        }
+
+        private void DestroyEditorPreviewImmediate()
+        {
+#if UNITY_EDITOR
+            var preview = editorPreviewInstance;
+            if (preview == null)
+            {
+                var existing = transform.Find(EditorPreviewName);
+                preview = existing != null ? existing.gameObject : null;
+            }
+
+            if (preview == null)
+            {
+                return;
+            }
+
+            editorPreviewInstance = null;
+            DestroyImmediate(preview);
+#endif
         }
 
         private void EnsureOrbitCamera()
@@ -509,5 +622,84 @@ namespace KineTutor3D.App
                 baseBody.TeleportRoot(baseLink.position, baseLink.rotation);
             }
         }
+
+        private static void SyncEndEffectorPoseFromControl(GameObject targetRoot)
+        {
+            if (targetRoot == null)
+            {
+                return;
+            }
+
+            var controlPrefab = Resources.Load<GameObject>(FR5TemplateSlimManifest.ControlPrefabWithEndEffectorResourcePath);
+            if (controlPrefab == null)
+            {
+                return;
+            }
+
+            var sourceAttachment = FR5EndEffectorAttachmentPoseSync.FindAttachment(controlPrefab.transform);
+            var targetAttachment = FR5EndEffectorAttachmentPoseSync.FindAttachment(
+                targetRoot.transform,
+                sourceAttachment != null ? sourceAttachment.AttachmentId : null);
+
+            if (!FR5EndEffectorAttachmentPoseSync.CopyPose(sourceAttachment, targetAttachment))
+            {
+                return;
+            }
+
+            targetAttachment.SetBaseFrame(FindChildRecursive(targetRoot.transform, "base_link"));
+        }
+
+        private static Transform FindChildRecursive(Transform parent, string childName)
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+
+            var direct = parent.Find(childName);
+            if (direct != null)
+            {
+                return direct;
+            }
+
+            for (var i = 0; i < parent.childCount; i++)
+            {
+                var found = FindChildRecursive(parent.GetChild(i), childName);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+#if UNITY_EDITOR
+        private static void ApplyEditorPreviewHideFlags(GameObject root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
+            var transforms = root.GetComponentsInChildren<Transform>(true);
+            for (var i = 0; i < transforms.Length; i++)
+            {
+                var go = transforms[i].gameObject;
+                go.hideFlags = HideFlags.DontSaveInEditor;
+
+                var components = go.GetComponents<Component>();
+                for (var j = 0; j < components.Length; j++)
+                {
+                    if (components[j] == null)
+                    {
+                        continue;
+                    }
+
+                    components[j].hideFlags = HideFlags.DontSaveInEditor;
+                }
+            }
+        }
+#endif
     }
 }

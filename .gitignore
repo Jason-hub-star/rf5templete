@@ -28,7 +28,7 @@
 *.zip
 
 # Local verification / scratch folders
-archive/
+# archive/ — STEP CAD originals are now tracked for team reference
 FR5_Slim_Template_Verification/
 FR5_Slim_Template_Verification_Clean/
 FR5_Slim_Template_Verification_Fresh/
@@ -45,3 +45,6 @@ evidence/
 # OS noise
 Thumbs.db
 Desktop.ini
+.DS_Store
+*.DS_Store
+.agents/

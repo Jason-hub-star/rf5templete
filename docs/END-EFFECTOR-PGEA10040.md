@@ -28,14 +28,22 @@
 
 ## 저장소 배치
 
-### 런타임 시각 자산
+### 런타임 시각 자산 (3파트 STL, FreeCAD 분리)
 
-- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40.stl`
+- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40_body.stl` (본체, 61,774 tri)
+- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40_finger_left.stl` (좌 핑거, 4,164 tri)
+- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40_finger_right.stl` (우 핑거, 4,164 tri)
 - `Assets/Runtime/Resources/EndEffectors/PGEA_100_40.prefab`
 
-### 원본 CAD 보관본
+### 레거시 (교체됨, 참고용)
 
-- `archive/EndEffectors/PGEA_100_40/CAD/PGEA-100-40-W-F_V1.0_3D_20241226.STEP`
+- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40.stl` (단일 STL, 이전 기준선)
+- `Assets/Runtime/EndEffectors/PGEA_100_40/Source/PGEA-100-40.fbx` (FBX 비교본)
+
+### 원본 CAD
+
+- `archive/EndEffectors/PGEA_100_40/CAD/` (STEP 파일 보관 예정)
+- FreeCAD 프로젝트에서 STEP → body/finger_left/finger_right로 분리 후 STL 내보내기
 
 ### 팀 공용 즉시 사용 prefab
 
@@ -44,15 +52,18 @@
 
 ## 팀 우선순위
 
-### 1. STL을 Unity visual source로 고정
+### 1. FreeCAD 3파트 STL을 Unity visual source로 고정
 
-- Unity에서 실제로 붙는 것은 `STL`
-- `STEP`은 치수/원점 검토용
+- Unity에서 실제로 붙는 것은 FreeCAD에서 분리한 3파트 `STL` (body + finger_left + finger_right)
+- `STEP`은 치수/원점 검토용, FreeCAD 파트 분리의 소스
 - 팀원은 `Resources/EndEffectors/PGEA_100_40.prefab`만 직접 참조하면 된다
+- Inspector에서 `Gripper Open Ratio` 슬라이더로 개폐 즉시 확인 가능
 
 ### 2. FR5 control/preview variant를 기본 사용
 
 - 팀원이 직접 wrist3에 붙이지 않게 한다
+- `FAIRINO_FR5_Control_PGEA10040.prefab`를 장착값 SSOT로 둔다
+- `FAIRINO_FR5_PGEA10040.prefab`와 에디터 preview는 Control의 엔드이펙터 포즈를 따라간다
 - 데모 씬과 런타임 로더는 attached variant를 먼저 찾고, 없을 때만 bare FR5로 fallback 한다
 - attached variant의 기본 장착 방향은 `ToolMount -> 바깥쪽 = gripper side` 규칙을 따른다
 
@@ -69,8 +80,10 @@
 - `jaw / gripping side`는 로봇 바깥 방향을 향해야 한다
 - `ToolMount`는 identity(무회전)로 둔다 — wrist3의 좌표계를 그대로 따른다
 - 방향 정렬은 `PGEA_100_40` 인스턴스의 로컬 Transform에서 한다
-- 현재 authored 값: `rotation Z -91.6°`, `position (0.004, 0.1699, 0.0324)`
+- 현재 authored 값: `rotation Z -91.6°`, `position (0.003, 0.1676, 0.031)`
 - 이 값은 STL 메쉬 원점과 wrist3 좌표계의 차이를 보정하기 위한 **시각적 정렬 값**이다
+- 2026-04-03 기준으로 X축을 1mm 줄여, 기존 STL 배치감을 유지하면서도 보고된 미세 편심만 완화했다
+- 현재 기준선은 `FAIRINO_FR5_Control_PGEA10040.prefab`에 저장된 장착값이며, preview는 로드 시 이 값을 복사한다
 - 실기 TCP calibration 값과는 별개이며, calibration 후 `TcpFrame`을 다시 잠궈야 한다
 
 ### 4. 조정 기준은 Tool/Base/World 모두 허용
@@ -80,12 +93,12 @@
 
 ## 사용 방법
 
-1. Unity에서 `RobotTemplate/End Effector/Install PGEA-100-40 On FR5` 실행
-2. 데모 씬을 열면 FR5 attached variant가 우선 로드된다
-3. Hierarchy에서 `PGEA_100_40` 오브젝트의 `FR5EndEffectorAttachment`를 선택한다
-4. Inspector에서 `Tool / Base / World` 기준으로 `TcpFrame`을 미세 조정한다
-5. Scene/Game view에서 TCP marker와 gizmo를 보며 위치를 맞춘다
-6. 기본 방향이 틀리면 setup tool을 다시 실행해 attached prefab을 재생성한다
+1. 최초 설치 또는 메쉬 재임포트가 필요할 때 `RobotTemplate/End Effector/Install PGEA-100-40 On FR5`를 실행한다
+2. 장착 미세 조정은 `FAIRINO_FR5_Control_PGEA10040.prefab`에서 한다
+3. `PGEA_100_40`의 `FR5EndEffectorAttachment`를 선택해 `Tool / Base / World` 기준으로 `TcpFrame`을 조정한다
+4. Scene/Game view에서 TCP marker와 gizmo를 보며 위치를 맞춘다
+5. preview asset을 즉시 저장 동기화하려면 `Sync Preview Variant From Control` 메뉴 또는 Inspector 버튼을 사용한다
+6. 에디터 preview와 preview reference는 로드 시 Control 엔드이펙터 포즈를 다시 복사한다
 
 ## 좌표계 주의사항
 
@@ -112,7 +125,7 @@
 |---|---|---|
 | TCP 읽기 명령 | `GetActualTCPPose`, `GetCurToolCoord` 호출 | 실기 연동 시 |
 | 좌표 문맥 저장 | `FairinoCoordContext` (tool ID, TCP offset) | teaching 기능 추가 시 |
-| Preview 동기화 | ghost target의 TCP offset 반영 | preview 기능 추가 시 |
+| Live preview 동기화 | 실기 TCP readback 기반 ghost target / marker offset 반영 | preview 기능 추가 시 |
 | Tool coordinate 검증 | "must match" 규칙 자동 확인 | live 운용 시 |
 
 ## FK와 TCP offset의 관계
@@ -214,15 +227,109 @@ MeasureGripper.cs로 분석한 PGEA-100-40 STL 원본 좌표 (단위: mm):
 ### 그리퍼 시각적 방향
 
 - **증상**: authored 값으로 한 번 성공했으나, Setup Tool 재실행 시 방향이 틀어짐
-- **원인**: Setup Tool exec가 불안정 (STL 재임포트 충돌), prefab 값이 적용 안 되는 경우 있음
-- **현재 상태**: authored 값(`Z -91.6°, pos (0.004, 0.1699, 0.0324)`)이 코드에 반영됨
-- **다음 단계**: Unity가 안정된 후 Install 메뉴로 prefab 재생성 → Play에서 확인
+- **원인**: Setup Tool이 재생성 시 tuned variant 값을 다시 참조하지 않으면 bootstrap 값으로 되돌아갈 수 있었음
+- **현재 상태**: authored 값(`Z -91.6°, pos (0.003, 0.1676, 0.031)`)이 `FAIRINO_FR5_Control_PGEA10040` 기준으로 반영되고, preview는 Control 값을 복사하도록 보강됨
+- **다음 단계**: Play에서 Control/preview가 동일 장착값으로 보이는지 재확인
 
-## 현재 의미
+## 추가 조사 결과 (2026-04-03)
+
+### authored 장착값 유지의 장점
+
+- 현재 authored 값은 STL 원점 비표준 문제를 우회한, 팀이 검증한 visual baseline이다.
+- `ToolMount`를 identity로 두고 `PGEA_100_40` 인스턴스에만 authored 보정을 넣는 구조는 wrist3 좌표계를 보존해 ROS 관절 동기화와 attached variant 재생성에 안전하다.
+- URDF를 수정하지 않아 FR5의 기존 `ArticulationBody` / mesh / material 구조를 보존한다.
+
+### authored 장착값 유지의 리스크
+
+- authored 값은 **시각 정렬 값**이지 실기 `tool coordinate`가 아니다. pendant/SDK TCP 값으로 재사용하면 live 운용 시 오차가 누적될 수 있다.
+- 현재 `TcpFrame`은 calibration 전 placeholder이고, marker도 실제 작업점이 아니라 calibration 대기 기준점에 가깝다.
+- `TemplateFAIRINO_FR5.TcpOffsetMeters`는 아직 zero placeholder라 calibration 전에는 FK/preview가 flange 기준으로만 해석된다.
+- 즉, 지금 구조에서 authored 값은 반드시 `visual-only`로 잠그고, 실기 TCP는 `TcpFrame` + SDK readback으로 별도 확정해야 한다.
+
+### TCP marker가 제위치에 없는 현재 이유
+
+- `PGEA_100_40.prefab`의 `TcpFrame` localPosition / localRotation은 현재 zero다.
+- `FR5EndEffectorAttachment`는 `TcpFrame` 위치 nudge와 gizmo 표시만 제공하고, 실기 TCP readback 동기화는 아직 없다.
+- `FR5EndEffectorAttachmentEditor`는 현재 위치 이동 중심 UI이며, Control prefab 수정 시 preview variant를 다시 맞추는 버튼을 제공한다. 자세 보정과 live 비교는 여전히 별도 구현이 필요하다.
+- 따라서 현재 노란색 marker는 calibrated TCP가 아니라 `calibration pending` 상태를 보여주는 보조 지표다.
+
+### 현재 구조에서 확인된 확장성 문제
+
+- `RosJointStateSubscriber`는 현재 `/joint_states`에서 `j1~j6`만 읽는다. gripper open/close 명령 경로는 아직 없다.
+- `FairinoUrdfJointDriver`는 6개 arm link만 캐싱하고, non-root `ArticulationBody`를 비활성화한다. 따라서 jaw를 URDF `prismatic joint`로 추가해도 현재 런타임 경로와는 바로 맞지 않는다.
+- 현재 엔드이펙터 prefab은 `VisualRoot` / `TcpFrame` 구조까지만 있고, `Adapter`, `JawLeft`, `JawRight` 같은 가동부 계층 SSOT가 없다.
+- ROS-TCP-Connector Visualizations 패키지는 topic / TF를 **시각화**하는 도구이지, tool TCP SSOT나 gripper 기구학을 대신 관리해 주지 않는다.
+- Unity Robotics Hub upstream 예제도 arm trajectory와 tool command를 분리한다. 향후 gripper 개폐는 `/gripper_command` 또는 SDK tool command 경로로 분리하는 편이 맞다.
+
+### 그리퍼 개폐 구현 (완료, ADR-008)
+
+- **방식**: FreeCAD에서 STEP → 3파트 STL 분리 (body + finger_left + finger_right) → Unity Transform 제어
+- **구현**: `FR5EndEffectorAttachment.SetGripperOpen(float ratio)` — ratio 0(닫힘)~1(열림)
+- **이동축**: 모델 공간 X축 (finger_left +X, finger_right -X, 스트로크 40mm)
+- **Inspector**: `Gripper Open Ratio` 슬라이더로 에디터에서 즉시 테스트 가능
+- **대칭 검증**: 좌우 finger 동일 (4,164 tri, 53.8×40.5×16.7mm, X축 미러)
+- **실기 연동 확장**: `SetGripperOpen` ← ROS `/gripper_command` subscriber 또는 SDK `GetGripperState`
+
+### 실기기 검은 추가 부품과 편심 리스크
+
+- 실기기에 있는 검은 추가 부품(브라켓, 스페이서, 핑거, 어댑터 등)이 prefab/mesh에 없으면, 현재 Unity 자산은 완전한 physical twin이 아니다.
+- 이 경우 TCP, 충돌 외형, 질량중심, 관성, 체감 편심이 모두 실제와 달라질 수 있다.
+- authored 값으로 시각적으로 잘 맞아 보여도, 그 추가 부품 두께/편심이 빠져 있으면 실기 tool center와 preview가 어긋날 수 있다.
+- 가장 안전한 방식은 실기 치수 또는 CAD를 확보해 `Adapter` 노드를 명시적으로 추가하고, calibration된 `TcpFrame`으로 최종 TCP를 잠그는 것이다.
+
+### 현재 구조 (2026-04-03 확정)
+
+```text
+wrist3_link
+  └── ToolMount                          (identity)
+       └── PGEA_100_40                   [FR5EndEffectorAttachment]
+            ├── VisualRoot
+            │    └── PGEA-100-40_Model   (scale 0.001, authored offset)
+            │         ├── body           (본체, 고정)
+            │         ├── finger_left    (좌 핑거, X축 + 이동)
+            │         └── finger_right   (우 핑거, X축 - 이동)
+            └── TcpFrame
+                 └── TcpMarker
+```
+
+- `ToolMount`는 identity 유지
+- `PGEA-100-40_Model` 하위에 3파트 STL이 개별 GameObject로 배치
+- `finger_left` / `finger_right`는 `FR5EndEffectorAttachment`의 `fingerLeft` / `fingerRight` 참조로 연결
+- 개폐 시 모델 공간 X축으로 ±20mm 이동 (스트로크 40mm, 모델 공간 mm 단위)
+- `SetGripperOpen(float ratio)` API로 런타임 제어 가능 (ROS/SDK 연동 확장점)
+
+### 향후 권장 구조 (Adapter 추가 시)
+
+```text
+wrist3_link
+  └── ToolMount               (identity)
+       └── Adapter            (실기 검은 추가 부품 / 브라켓)
+            └── PGEA_100_40   [FR5EndEffectorAttachment]
+                 ├── VisualRoot
+                 │    └── PGEA-100-40_Model
+                 │         ├── body
+                 │         ├── finger_left
+                 │         └── finger_right
+                 └── TcpFrame
+```
+
+- `Adapter`는 실기 검은 부품 CAD/치수 확보 후 추가 (ADR-009)
+
+### 외부 참고
+
+- ROS TCP Connector README: <https://github.com/Unity-Technologies/ROS-TCP-Connector>
+- Visualizations README: <https://github.com/Unity-Technologies/ROS-TCP-Connector/blob/main/com.unity.robotics.visualizations/Documentation~/README.md>
+- Unity Robotics Hub Pick-and-Place: <https://github.com/Unity-Technologies/Unity-Robotics-Hub/blob/main/tutorials/pick_and_place/README.md>
+- URDF Importer README: <https://github.com/Unity-Technologies/URDF-Importer>
+- Unity Blend Shapes Manual: <https://docs.unity3d.com/2021.1/Documentation/Manual/BlendShapes.html>
+
+## 현재 의미 (2026-04-03 업데이트)
 
 - 지금 저장된 값은 "팀이 공통으로 보는 시각화/프리뷰 기준선"이다
-- 시각적 정렬은 authored 값으로 확정되었으나, Unity 도메인 리로드 문제로 검증 미완
-- TCP 좌표계는 calibration 전까지 확정이 아니다
-- `TcpCalibrated = false` 상태에서 TCP marker는 노란색으로 표시된다
+- `FAIRINO_FR5_Control_PGEA10040.prefab`가 장착값 SSOT이고, preview는 이 값을 자동 복사한다
+- **그리퍼 메쉬가 3파트(body + finger_left + finger_right)로 분리**되어 개폐 시각화가 즉시 가능하다
+- `SetGripperOpen(float)` API가 ROS/SDK 연동 확장점으로 준비되어 있다
+- TCP 좌표계는 calibration 전까지 확정이 아니다 (`TcpCalibrated = false`, 노란색 marker)
 - ROS 관절 동기화 시 그리퍼는 Transform 계층으로 자동 추종한다
-- 즉, 현재 repo는 `mesh import + visual alignment + FK TCP offset 준비 + ROS 관절 연동 + shared TCP editing workflow`를 책임진다
+- 즉, 현재 repo는 `3파트 mesh + visual alignment + gripper open/close + FK TCP offset 준비 + ROS 관절 연동 + shared TCP editing workflow`를 책임진다
+- 실기 연동 시 필요한 것: `/gripper_command` 토픽 구독 또는 SDK `GetGripperState` 호출 → `SetGripperOpen` 연결
